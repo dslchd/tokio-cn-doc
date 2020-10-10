@@ -157,6 +157,6 @@ Tokio有很多功能(TCP,UDP,Unix 套接字, 定时器(timers), 同步工具(syn
 
 比如现在我们在tokio的依赖中使用了 "full" 的特性.
 
-[指南](Introduction.md) <-----------------------------------------------------------------------> [Spawning](Spawning.md)
+&larr; [指南](Introduction.md)
 
-<script type="math/tex; mode=display" id="MathJax-Element-11433">\Leftarrow</script>
+&rarr; [Spawning](Spawning.md) 
