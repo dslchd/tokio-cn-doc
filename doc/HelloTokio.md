@@ -124,7 +124,7 @@ main 函数用来启动应用, 它与大多数Rust其它包中的函数不同:
 * 1. 它是一个 `async fn` .
 * 2. 它使用 `#[tokio::main]` 注解.
 
-我们要进入一个异步上下文时一个 `async fn` 被使用. 但是异步函数必须由一个运行时([runtime(https://docs.rs/tokio/0.2/tokio/runtime/index.html)])来执行.
+我们要进入一个异步上下文时,一个 `async fn` 被使用. 但是异步函数必须由一个运行时 [runtime](https://docs.rs/tokio/0.2/tokio/runtime/index.html) 来执行.
 运行时包含异步任务调度器(scheduler), 提供I/O事件, 计时器(timers)等等. 运行时不会自动开始,因此需要main函数来启动它.
 
 `#[tokio::main]` 函数宏. 它将 `async fn main()` 转换为一个初始化一个运行时实例且执行异步main函数的 同步 `fn main()`. 
@@ -156,3 +156,7 @@ Tokio有很多功能(TCP,UDP,Unix 套接字, 定时器(timers), 同步工具(syn
 不是所有的应用都需要所有的功能. 当我们尝试去优化编译时间或者应用占用空间时, 应用程序可以去选择仅仅它需要使用的特性.
 
 比如现在我们在tokio的依赖中使用了 "full" 的特性.
+
+[指南](Introduction.md) <-----------------------------------------------------------------------> [Spawning](Spawning.md)
+
+<script type="math/tex; mode=display" id="MathJax-Element-11433">符号</script>
