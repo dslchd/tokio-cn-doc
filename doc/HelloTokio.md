@@ -159,4 +159,4 @@ Tokio有很多功能(TCP,UDP,Unix 套接字, 定时器(timers), 同步工具(syn
 
 [指南](Introduction.md) <-----------------------------------------------------------------------> [Spawning](Spawning.md)
 
-<script type="math/tex; mode=display" id="MathJax-Element-11433">符号</script>
+<script type="math/tex; mode=display" id="MathJax-Element-11433">\Leftarrow</script>
