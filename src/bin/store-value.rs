@@ -15,11 +15,12 @@ async fn process(socket: TcpStream) {
         let response = match Command::from_frame(frame).unwrap() {
             Set(cmd) => {
                 db.insert(cmd.key().to_string(), cmd.value().clone());
-                Frame::Simple("Ok".to_string())
+                Frame::Simple("OK".to_string())
             }
             Get(cmd) => {
                 if let Some(value) = db.get(cmd.key()) {
-                    Frame::Bulk(value.clone())
+                    // Frame::Bulk() 里面要是一个Bytes 使用 into() 转换为 Bytes
+                    Frame::Bulk(value.clone().into())
                 }else {
                     Frame::Null
                 }
@@ -36,6 +37,7 @@ async fn process(socket: TcpStream) {
 async fn main() {
     // 绑定监听器到一个地址
     let mut listener = TcpListener::bind("127.0.0.1:6379").await.unwrap();
+    println!("Mini Redis Server started, listen port: {}", 6379);
     loop {
         let (socket, _) = listener.accept().await.unwrap();
         tokio::spawn(async move {
