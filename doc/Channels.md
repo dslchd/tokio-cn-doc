@@ -176,3 +176,81 @@ let t2 = tokio::spawn(async move {
 });
 ```
 
+## 接收响应
+最后一步就是接收来管理任务的响应. `GET` 命令需要获取值, 而 `SET` 命令需要知道操作是否完成. 
+
+为了传递响应,可以使用 `oneshot` 通道. `oneshot` 通道是一个经过了优化的单生产者单消费者通道,用来发送单个值. 在我们的案例中,单个值就是响应.
+
+与 `mpsc` 类似, `oneshot` 返回一个发送者(Sender)和一个接收者(receiver)处理器.
+
+```rust
+use tokio::sync::oneshot;
+
+let (tx,rx) = oneshot::channel();
+```
+
+与 `mpsc` 不同, `oneshot` 它不能指定任何容量, 因为容量始终为1. 另外两个处理器都不能被克隆(译者注: 指 tx, rx).
+
+为了接收到来自管理任务的响应, 在发送一个命令之前, 一个 `oneshot` 通道将被创建. 通道 `Sender` 的一半包含在管理任务的命令中. 接收方的一半用来接收响应.
+
+首先, 更新 `Command` 来包含一个　`Sender` . 为了方便, 为 `Sender` 定义一个类型别名.
+
+```rust
+use tokio::sync::oneshot;
+use bytes::Bytes;
+
+/// 多个不同的命令在单个通道上复用.
+#[derive(Debug)]
+enum Command {
+    Get {
+        key: String,
+        resp: Responder<Option<Bytes>>,
+    },
+    Set {
+        key: String,
+        val: Vec<u8>,
+        resp: Responder<()>,
+    },
+}
+
+/// 由请求者提供并通过管理任务来发送,再将命令的响应返回给请求者.
+type Responder<T> = oneshot::Sender<mini_redis::Result<T>>;
+```
+
+现在,更新发出命令的任务来包括 `oneshot::Sender` .
+
+```rust
+let t1 = tokio::spawn(async move {
+    let (resp_tx, resp_rx) = oneshot::channel();
+    let cmd = Command::Get {
+        key: "hello".to_string(),
+        resp: resp_tx,
+    };
+
+    // 发送 GET 请求
+    tx.send(cmd).await.unwrap();
+
+    // 等待响应结果
+    let res = resp_rx.await;
+    println!("GOT = {:?}", res);
+});
+
+let t2 = tokio::spawn(async move {
+    let (resp_tx, resp_rx) = oneshot::channel();
+    let cmd = Command::Set {
+        key: "foo".to_string(),
+        val: b"bar".to_vec(),
+        resp: resp_tx,
+    };
+
+    // 发送 GET 请求
+    tx2.send(cmd).await.unwrap();
+
+    // 等待响应结果
+    let res = resp_rx.await;
+    println!("GOT = {:?}", res)
+});
+```
+
+
+

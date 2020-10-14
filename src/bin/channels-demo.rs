@@ -1,16 +1,22 @@
 use bytes::Bytes;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, oneshot};
 use std::option::Option::Some;
 use mini_redis::client;
+
+
+/// 由请求者提供并通过管理任务来发送,再将命令的响应返回给请求者.
+type Responder<T> = oneshot::Sender<mini_redis::Result<T>>;
 
 #[derive(Debug)]
 enum Command {
     Get {
         key: String,
+        resp: Responder<Option<Bytes>>,
     },
     Set {
         key: String,
-        val: Bytes,
+        val: Vec<u8>,
+        resp: Responder<()>,
     },
 }
 
@@ -22,8 +28,10 @@ async fn main() {
     let mut tx2 = tx.clone();
 
     let t1 = tokio::spawn(async move {
+        let (resp_tx, resp_rx) = oneshot::channel();
         let cmd = Command::Get {
             key: "hello".to_string(),
+            resp: resp_tx,
         };
 
         tx.send(cmd).await.unwrap();
