@@ -78,8 +78,7 @@ use mini_redis::{Connection, Frame};
 async fn process(socket: TcpStream, db: Db) {
     use mini_redis::Command::{self, Get, Set};
 
-    // Connection, provided by `mini-redis`, handles parsing frames from
-    // the socket
+    // 通过 mini-redis 提供 Connection , 用来处理解析 socket中的帧
     let mut connection = Connection::new(socket);
 
     while let Some(frame) = connection.read_frame().await.unwrap() {
@@ -100,7 +99,7 @@ async fn process(socket: TcpStream, db: Db) {
             cmd => panic!("unimplemented {:?}", cmd),
         };
 
-        // Write the response to the client
+        // 写回响应到客户端
         connection.write_frame(&response).await.unwrap();
     }
 }
@@ -179,7 +178,7 @@ note: future is not `Send` as this value is used across an await
 ```
 
 发生这的原因是, `std::sync::MutexGuard` 类型不是 `Send` . 这意味着你不能够发送一个互斥锁到另外一个线程中, 并且会发生错误, 因为Tokio
-运行时可以在第个 `.await` 的线程之间移动任务. 为了避免这种情况, 你需要重组代码来使互斥锁的析构函数在 `.await` 之前运行.
+运行时可以在每个 `.await` 的线程之间移动任务. 为了避免这种情况, 你需要重组代码来使互斥锁的析构函数在 `.await` 之前运行.
 
 ```rust
 use std::sync::Mutex;

@@ -1,6 +1,6 @@
 use tokio::net::{TcpListener, TcpStream};
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::{Arc, Mutex};
 use bytes::Bytes;
 use mini_redis::{Connection, Frame, Command};
 use std::option::Option::Some;
@@ -16,13 +16,13 @@ async fn main() -> std::io::Result<()>{
 
     let db = Arc::new(Mutex::new(HashMap::new()));
 
-
     loop {
         let (socket, _) = listener.accept().await?;
         // clone
-        let db = Db.clone();
+        let db = db.clone();
         println!("Accepted");
         // 处理socket
+        process(socket, db).await;
     }
 
 }
