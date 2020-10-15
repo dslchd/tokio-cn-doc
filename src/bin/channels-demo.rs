@@ -21,9 +21,33 @@ enum Command {
 }
 
 
+/// 示例配合 shared-state 服务端使用， 或者按前面教程里 使用 mini-redis-server 服务端
 #[tokio::main]
 async fn main() {
     let (mut tx, mut rx) = mpsc::channel(32);
+
+    // 产生一个管理任务
+    let manager = tokio::spawn(async move {
+        //建立一个与服务器的链接
+        let mut client = client::connect("127.0.0.1:6379").await.unwrap();
+
+        // 开始接收redis server 那边的消息
+        while let Some(message) = rx.recv().await {
+            use Command::*;
+            // 匹配redis返回的 命令类型
+            match message {
+                Get { key, resp } => {
+                    let res = client.get(&key).await;
+                    let _ = resp.send(res);
+                }
+                Set { key, val, resp } => {
+                    let res = client.set(&key, val.into()).await;
+                    let _ = resp.send(res);
+                }
+            }
+        }
+    });
+
     // clone 发送者完成多个任务的发送
     let mut tx2 = tx.clone();
 
@@ -33,39 +57,35 @@ async fn main() {
             key: "hello".to_string(),
             resp: resp_tx,
         };
-
-        tx.send(cmd).await.unwrap();
+        // 发送 GET 请求
+        if tx.send(cmd).await.is_err() {
+            eprintln!("t1 connection task shutdown");
+            return;
+        }
+        // 等待响应
+        let res = resp_rx.await;
+        println!("T1 GOT = {:?}", res);
     });
 
     let t2 = tokio::spawn(async move {
+        let (resp_tx, resp_rx) = oneshot::channel();
         let cmd = Command::Set {
-            key: "foo".to_string(),
-            val: "bar".into(),
+            key: "hello".to_string(),
+            val: "world".into(),
+            resp: resp_tx,
         };
-        tx2.send(cmd).await.unwrap();
+        if tx2.send(cmd).await.is_err() {
+            eprintln!("t2 connection task shutdown");
+            return;
+        }
+        // 等待响应
+        let res = resp_rx.await;
+        println!("T2 GOT = {:?}", res);
     });
 
     // while let Some(message) = rx.recv().await {
     //     println!("Got = {}", message);
     // }
-
-    let manager = tokio::spawn(async move {
-        //建立一个与服务器的链接
-        let mut client = client::connect("127.0.0.1:6379").await.unwrap();
-
-        // 开始接收消息
-        while let Some(message) = rx.recv().await {
-            use Command::*;
-            match message {
-                Get { key } => {
-                    client.get(&key).await.unwrap();
-                }
-                Set { key, val } => {
-                    client.set(&key, value).await.unwrap();
-                }
-            }
-        }
-    });
 
     t1.await.unwrap();
     t2.await.unwrap();
