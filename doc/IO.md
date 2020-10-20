@@ -1,25 +1,20 @@
 ## I/O
 
-在Tokio中的I/O操作几乎与`std`的相同, 但是(Tokio中的I/O操作是)是异步的. 这里有关于读( [AsyncRead](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html) )
-和写( [AsyncWrite](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html) )的trait. 特定的类型适当的实现了这些trait, 比如:
-( [TcpStream](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html), [File](https://docs.rs/tokio/0.2/tokio/fs/struct.File.html), [Stdout](https://docs.rs/tokio/0.2/tokio/io/struct.Stdout.html) )
-`AsyncRead` 与 `AsyncWrite` 也可以通过许多数据结构来实现, 例如, `Vec<u8>` 和 `&[u8]` . 这允许在需要一个reader与writer的地方使用字节数组.
+在Tokio中的I/O操作几乎与`std`的相同, 但是(Tokio中的I/O操作是)是异步的. 这里有关于读( [AsyncRead](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html) )和写( [AsyncWrite](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html) )的trait. 特定的类型适当的实现了这些trait, 比如:( [TcpStream](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html), [File](https://docs.rs/tokio/0.2/tokio/fs/struct.File.html), [Stdout](https://docs.rs/tokio/0.2/tokio/io/struct.Stdout.html) ) `AsyncRead` 与 `AsyncWrite` 也可以通过许多数据结构来实现, 例如, `Vec<u8>` 和 `&[u8]` . 这允许在需要一个reader与writer的地方使用字节数组.
 
 在本章节页中, 会介绍使用Tokio来进行基本的I/O读写操作过程, 并通过一些示例进行介绍. 在下一页中我们将获得更多的关于I/O操作的高级示例.
 
 ## `异步读` 和 `异步写` (`AsyncRead` and `AsyncWrite`)
-这两个trait提供了异步读和写入字节流的便利性. 这两个trait中的方法通常不能直接的调用, 就好像你不能从`Future` trait中手动的调用 `poll` 方法一样.
+这两个trait为异步读和写入字节流提供了便利性. 这两个trait中的方法通常不能直接的调用, 就好像你不能从`Future` trait中手动的调用 `poll` 方法一样.
 取而代之是, 你将通过 `AsyncReadExt` 与 `AsyncWriteExt` 提供的实用程序方法来使用它.
 
 让我们简单的看看其中的几个方法. 所有的方法都是异步的且必须使用 `.await`.
 
-`async fn read()`
+### `async fn read()`
 
-[AsyncReadExt::read](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncReadExt.html#method.read) 提供了一个异步的用来读取数据到缓存中的方法,
-并返回读取的字节数.
+[AsyncReadExt::read](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncReadExt.html#method.read) 提供了一个异步的用来读取数据到缓充区中的方法,并返回读取的字节数.
 
-**注意** : 当 `read()` 返回 `Ok(0)` 时, 这表明流已被关闭了. 对 `read()` 的任何其它的调用将立即返回`Ok(0)`完成. 
-对于 [TcpStream](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html) 实例, 这表明socket的读取部分已经关闭.
+**注意** : 当 `read()` 返回 `Ok(0)` 时, 这表明流已被关闭了. 对 `read()` 的任何其它的调用将立即返回`Ok(0)`完成. 对于 [TcpStream](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html) 实例, 这表明socket的读取部分已经关闭.
 
 ```rust
 use tokio::fs::File;
@@ -38,11 +33,11 @@ async fn main() -> io::Result<()> {
 }
 ```
 
-`async fn read_to_end()`
- 
+### `async fn read_to_end()`
+
  [AsyncReadExt::read_to_end](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncReadExt.html#method.read_to_end) 
  从流中读取所有的字节直到遇到 EOF.
- 
+
  ```rust
  use tokio::io::{self, AsyncReadExt};
  use tokio::fs::File;
@@ -56,9 +51,9 @@ async fn main() -> io::Result<()> {
      f.read_to_end(&mut buffer).await?;
      Ok(())
  }
-```
+ ```
 
-`async fn write()`
+### `async fn write()`
 
 [AsyncWriteExt::write](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWriteExt.html#method.write) 将缓冲区中的数据写入到writer
 并返回写入的字节数.
@@ -74,12 +69,12 @@ async fn main() -> io::Result<()> {
     // 写入字字节符串的一些前缀, 但不一定是全部
     let n = file.write(b"some bytes").await?;
 
-    println!("Wrote the first {} bytes of 'some bytes'.", n);
+    println!("Write the first {} bytes of 'some bytes'.", n);
     Ok(())
 }
 ```
 
-`async fn write_all()`
+### `async fn write_all()`
 
 [AsyncWriteExt::write_all](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWriteExt.html#method.write_all) 将整个缓存区写入到writer.
 
@@ -96,12 +91,12 @@ async fn main() -> io::Result<()>{
 }
 ```
  这两个trait都包含了其它有用的方法. 有关完整的列表, 请参考API文档.
- 
+
  ## 辅助函数(Helper functions)
  另外, 与 `std` 包中一样, `tokio::io`模块也包含了一些有用的实用函数和用于处理标准输入,输出,错误的API. [standard input](https://docs.rs/tokio/0.2/tokio/io/fn.stdin.html),
  [standard output](https://docs.rs/tokio/0.2/tokio/io/fn.stdout.html), [standard error](https://docs.rs/tokio/0.2/tokio/io/fn.stderr.html) .
  比如, `tokio::io::copy` 可以异步将reader中的全部内容复制到writer中去.
- 
+
  ```rust
  use tokio::fs::File;
  use tokio::io;
@@ -114,7 +109,7 @@ async fn main() -> io::Result<()> {
     io::copy(&mut reader, &mut file).await?;
     Ok(())
 }
-```
+ ```
 
 注意, 这利用了字节数组也实现了 `AsyncRead` 这一功能.
 
@@ -137,7 +132,7 @@ use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-    let mut listener = TcpListener::bing("127,0.0.1:6124").await.unwrap();
+    let mut listener = TcpListener::bind("127,0.0.1:6124").await.unwrap();
     loop {
         let (mut socket, _) = listener.accept().await?;
         tokio::spawn(async move {
@@ -196,16 +191,11 @@ async fn main() -> io::Result<()> {
 }
 ```
 
-因为 `io::split` 支持任意实现了`AsyncRead+AsyncWrite` 类型的值且返回独立的处理器, `io::split`内部使用了`Arc`与`Mutex`. 使用`TcpStream`
-可以避免这种开销, `TcpStream` 提供了两个专门的拆分函数.
+因为 `io::split` 支持任意实现了`AsyncRead+AsyncWrite` 类型的值且返回独立的处理器, `io::split`内部使用了`Arc`与`Mutex`. 使用`TcpStream`可以避免这种开销, `TcpStream` 提供了两个专门的拆分函数.
 
-[TcpStream::split](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html#method.split) 引用流并返回一个reader和writer的处理器.
-因为使用了引用,所以两个处理器都必须保持与调用`split()`相同的任务一致. 这个特殊的`split`是零成本的. 这里不需要`Arc`或者`Mutex`. 
-`TcpStream`也提供了一个 [into_split](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html#method.into_split) 功能,
-此功能支持仅需要`Arc`就能跨任务移动处理器.
+[TcpStream::split](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html#method.split) 引用流并返回一个reader和writer的处理器.因为使用了引用,所以两个处理器都必须保持与调用`split()`相同的任务一致. 这个特殊的`split`是零成本的. 这里不需要`Arc`或者`Mutex`. `TcpStream`也提供了一个 [into_split](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html#method.into_split) 功能,此功能支持仅需要`Arc`就能跨任务移动处理器.
 
-因为`io::copy()`在属于`TcpStream`的同一个任务上被调用,所以我们可以使用 [TcpStream::split](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html#method.split).
-处理echo逻辑服务的任务变为:
+因为`io::copy()`在属于`TcpStream`的同一个任务上被调用,所以我们可以使用 [TcpStream::split](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html#method.split).处理echo逻辑服务的任务变为:
 
 ```rust
 tokio::spawn(async move{
@@ -261,6 +251,65 @@ async fn main() -> io::Result<()> {
 }
 ```
 
-让我们分解一下上面的过程. 首先, 
+让我们分解一下上面的过程. 首先, 由于使用了`AsyncRead`和`AsyncWrite`, 其扩展的trait必须要被引入到范围内.
 
+```rust
+use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
+```
 
+(译者注: 上面有说过,我们仅能使用其扩展的trait)
+
+### 分配一个缓冲区(Allocating a buffer)
+有种策略是从socket中读取一些数据到buffer(缓冲区)中,然后将缓冲区的内容写回到socket中去.
+
+```rust
+let mut buffer = vec![0;1024];
+```
+
+要明确的避免栈缓冲区. 回想一下 [之前的](./Spawning.md) (中的Send边界), 所有通过对`.await`调用存活的任务数据都必须由任务本身存储.
+在这种情况下,将在`.await`的调用中使用`buf`. 所有的任务数据都被存储在一个分配中. 你可以将其看作一个枚举, 其中每个变量体都是为特定调用
+`.await`而需要存储的数据.
+
+如果buffer由栈数组来表示, 那么每一个接受socket产生的任务的内部结构可能类似于:
+
+```rust
+struct Task {
+    // 内部的任务字段
+    task: enum {
+        AwaitingRead {
+            socket: TcpStream,
+            buf: [BufferType],
+        },
+        AwaitingWriteAll {
+            socket: TcpStream,
+            buf: [BufferType],
+        }
+
+    }
+}
+```
+
+如果栈数组被使用来作来buffer的类型, 它将以 _内联_ 的方式存储在任务结构中. 这将使用任务本身的结构变得非常大. 另外缓冲区buffer的大小通常是
+页面大小. 反过来,这会使用任务(Task)大小变得很臃肿: `$page-size + a-few-bytes`.
+
+编译器对异步结块布局的优化比基本的`enum`(枚举)更加好. 实际上,变量不会像枚举那样在变体中移动. 但是,任务结构体的大小至少与最大变量一样大.
+
+### 处理 EOF(Handling EOF)
+(译者注: EOF: "end of file" 的缩写, 表示 "文字流结尾" 这种流(Stream) 可以是文件,也可以是标准输入. 一般理解为流的结束标识)
+
+当读取TCP流的一半时关闭了, 调用`read()`会返回`Ok(0)`. 以这一点来退出循环是很重要的. 忘记以EOF标识来跳出循环是bug的常见来源方式.
+
+```rust
+loop {
+    match socket.read(&mut buffer).await {
+        // 返回值是 Ok(0) 标志, 表示远端已经关闭
+        Ok(0) => {
+            // 其它处理
+        }
+    }
+}
+```
+
+忘记以EOF标识来跳出循环的结果就是会造成CPU 100%循环占用. 关闭socket后, `socket.read()` 会立即返回. 然后循环会一直重复下去.
+
+完整的代码参考 [这里](https://github.com/tokio-rs/website/blob/master/tutorial-code/io/src/echo-server.rs)
