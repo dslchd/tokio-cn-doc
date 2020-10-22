@@ -10,3 +10,4 @@ edition = "2018"
 tokio = {version = "0.2", features = ["full"]}
 mini-redis = "0.2"
 bytes = "0.5"
+rand = "0.5.5"
