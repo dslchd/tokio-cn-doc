@@ -73,13 +73,13 @@ async fn main() {
 
 ```rust
 use tokio::net::TcpStream;
-use mini_redis::{Connection, Frame};
+use mini_redis::{connection, Frame};
 
 async fn process(socket: TcpStream, db: Db) {
     use mini_redis::Command::{self, Get, Set};
 
-    // 通过 mini-redis 提供 Connection , 用来处理解析 socket中的帧
-    let mut connection = Connection::new(socket);
+    // 通过 mini-redis 提供 connection , 用来处理解析 socket中的帧
+    let mut connection = connection::new(socket);
 
     while let Some(frame) = connection.read_frame().await.unwrap() {
         let response = match Command::from_frame(frame).unwrap() {
