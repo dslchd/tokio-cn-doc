@@ -1,5 +1,5 @@
 [package]
-name = "tokio-CN-doc"
+name = "tokio-cn-doc"
 version = "0.1.0"
 authors = ["dengshenglong <dslchd@@qq.com>"]
 edition = "2018"
