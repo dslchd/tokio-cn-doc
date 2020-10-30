@@ -226,7 +226,7 @@ mini-tokio只会在该时间过去后再轮询任务.
 为了达到这一目的，在对一个资源进行轮询且资源未准备好时，资源转换为就绪状态后将发送一个通知.
 
 ## 唤醒(Wakers)
-通过该系统(译者注: 指唤醒)，资源能能通知等待它的任务表明已经准备就绪，可以继续进行一些其它的操作了.
+通过该系统(译者注: 指唤醒)，资源在通知等待它的任务时表明已经准备就绪，可以继续进行一些其它的操作了.
 
 让我们再次看看`Future::poll`的定义:
 
@@ -235,8 +235,7 @@ fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output>;
 ```
 
 `poll`函数中的`Context`参数有一个`waker()`方法. 此方法返回一个绑定到当前任务的[Waker](https://doc.rust-lang.org/std/task/struct.Waker.html) .
-`Waker`中又有一个`wake()`方法. 调用这个方法会向执行器发出信息，说明应该安排相关任务的执行计划. 当资源的状态转换到就绪状态时，它们会调用`wake()`方法，
-来通知执行者轮询任务来推进资源的状态.
+`Waker`中又有一个`wake()`方法. 调用这个方法会向执行器发出信息，说明应该安排相关任务的执行计划. 当资源的状态转换到就绪状态时，它们会调用`wake()`方法，来通知执行者轮询任务来推进资源的状态.
 
 ### 更新`Delay`(Updating `Delay`)
 我们能更新`Delay`来使用唤醒(wakers):
@@ -314,8 +313,7 @@ impl Future for Delay {
 发信号给waker. 因为我们没有实现计时器(timer)线程，所以我们向唤醒程序(waker)发送了内联信息. 这样做的结果是为了future能重新被调度，再次执行，
 并且可能还没有完全准备好.
 
-请注意，你可以向waker发送更多的不是必须的信号. 在这种特殊的情况下，即使我们没有准备好继续操作，我们也会向waker发出信号. 除了浪费一个CPU时钟周期外，
-并没有什么问题. 但是，这种特殊的实现将导致非常繁忙的循环.
+请注意，你可以向waker发送更多的不是必须的信号. 在这种特殊的情况下，即使我们没有准备好继续操作，我们也会向waker发出信号. 除了浪费一个CPU时钟周期外，并没有什么问题. 但是，这种特殊的实现将导致非常繁忙的循环.
 
 ### 更新Mini-Tokio(Updating Mini-Tokio)
 接下来就是更新Mini Tokio 来接收waker的通知. 我们想让执行器在仅当任务被唤醒时才运行它们，为了做到这一点，Mini Tokio将提供自己的waker.
@@ -324,9 +322,7 @@ impl Future for Delay {
 更新后的Mini Tokio将使用channel来存储计划任务. 通道(Channel)允许任务以队列的方式从任意线程执行. Wakers必须是 `Send`和`Sync` 类型的，
 因此我们使用 crossbeam 包中的channel，因为标准库中的channel不是`Sync`的.
 
-`Send` 与 `Sync` 是Rust提供的与并发相关的一种标记trait. Send 类型可以在不同的线程中传递. 大多数类型都是 Send ，但是像 [Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html) 
-却不是. 可以通过不可变引用并发访问的类型是 Sync. 一个类型是 Send 但不是 Sync ---- 一个很好的例子是 [Cell](https://doc.rust-lang.org/std/cell/struct.Cell.html)，
-可以通过不可变引用对其修改，因此它不能并发的共享访问.
+`Send` 与 `Sync` 是Rust提供的与并发相关的一种标记trait. Send 类型可以在不同的线程中传递. 大多数类型都是 Send ，但是像 [Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html) 却不是. 可以通过不可变引用并发访问的类型是 Sync. 一个类型是 Send 但不是 Sync ---- 一个很好的例子是 [Cell](https://doc.rust-lang.org/std/cell/struct.Cell.html)，可以通过不可变引用对其修改，因此它不能并发的共享访问.
 
 更多关于 `Send` 与 `Sync` 的细节可以参考[chapter in the Rust book](https://doc.rust-lang.org/book/ch16-04-extensible-concurrency-sync-and-send.html).
 
@@ -344,7 +340,7 @@ use std::sync::Arc;
 
 struct MiniTokio {
     scheduled: channel::Receiver<Arc<Task>>,
-    sender: cahnnel::Sender<Arc<Task>>,
+    sender: channel::Sender<Arc<Task>>,
 }
 
 struct Task {
