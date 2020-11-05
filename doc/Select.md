@@ -567,6 +567,9 @@ async fn main() {
     }
 }
 ```
+我们使用了与之前例子类似的策略. 异步函数在循环外部被调用并分配给`operation`变量. `operation`变量被固定. 循环同时在`operation`与通道接收在选择(select).
+
+注意到，`action()`是怎样传入一个`Option<i32>`参数的，在我们收到第一个偶整数之前
 
 
 
