@@ -480,7 +480,7 @@ async fn main() {
 
 如果我们移除`tokio::pin!`这一行并再去尝试编译，我们会得到下面的错误:
 
-```rust
+```text
 error[E0599]: no method named `poll` found for struct
      `std::pin::Pin<&mut &mut impl std::future::Future>`
      in the current scope
@@ -569,8 +569,37 @@ async fn main() {
 ```
 我们使用了与之前例子类似的策略. 异步函数在循环外部被调用并分配给`operation`变量. `operation`变量被固定. 循环同时在`operation`与通道接收在选择(select).
 
-注意到，`action()`是怎样传入一个`Option<i32>`参数的，在我们收到第一个偶整数之前
+注意到，`action()`是怎样传入一个`Option<i32>`参数的，在我们收到第一个偶整数之前，我们必须实例化一些`operation`. 我们让`action()`传入`Option`并返回`Option`.
+如果传入的是`None`就返回`None`. 第一次迭代，`operation`立即完成，并显示`None`.
 
+这个示例使用了一些新语法. 第一个分支包含`, if !done`. 这是分支的前提. 在解释其工作原理之前，让我们看一下如果省略了前提条件会发生什么. 
+省略`, if !done` 并运行示例会得到如下输出结果:
+
+```text
+thread 'main' panicked at '`async fn` resumed after completion', src/main.rs:1:55
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+当尝试在`operation`完成之后再去使用它，就会发生此错误. 通常，在使用`.await`时，等待的值会被消费. 在这个例子中我们在一个引用上等待.
+这意味着`operation`完成之后它任然存在.
+
+为了避免这种panic，如果`operation`完成了，我们必须注意禁用第一个分支. `done`变量用于跟踪`operation`是否完成. 一个`select!`分支可以包含
+一个前提条件. `select!`在分支上等待之前该前提条件会被检查. 如果前提条件的评估结果是`false`，则禁用分支. `done`变量被初始化为`false`.
+当`operation`完成后，`done`被设置为`true`. 下一次循环迭代将禁用`operation`分支. 当从channel中接收到偶数时，`operation`会被重置且
+`done`再次被设置为 `false`.
+
+## 每个任务的并发(Per-task concurrency)
+`tokio::spawn` 与 `select!` 都可以运行并发异步操作. 但是用于运行并发操作的策略有所不同. `tokio::spawn` 函数传入一个异步操作并产生一个
+新的任务去运行它. 任务是一个tokio运行时调度的对象. Tokio独立调度两个不同的任务. 它们可以在不同的操作系统线程上同时运行. 因此产生的任务与
+产生的线程都有相同的限制: 不可借用.
+
+`select!`宏能在同一个任务上同时运行所有分支. 因为`select!`宏上的所有分支被同一个任务执行，它们永远不会同时运行. `select!`宏的多路复用
+异步操作也在单个任务上运行.
+
+
+&larr; [深入异步(Async in depth)](AsyncInDepth.md)
+
+&rarr; [流(Streams)](Streams.md)
 
 
 
