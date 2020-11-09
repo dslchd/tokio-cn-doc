@@ -11,9 +11,9 @@
 
 ## 获取帮助(Getting Helping)
 在任何时候, 如果你的学习被卡住, 你总能在 [Discord](https://discord.gg/tokio) 或 [Github discussions](https://github.com/tokio-rs/tokio/discussions) 上得到帮助.
-不必担心问一些"初学者"问题. 我们都是从某个地方开始的,并且乐于提供帮助.
+不必担心问一些 **"初学者"** 问题. 我们都是从某个地方开始的,并且乐于提供帮助.
 
-## 先决条件(Prerequisites)
+## 前提条件(Prerequisites)
 读者应该已经熟悉了 [Rust](https://rust-lang.org/) . [Rust book](https://doc.rust-lang.org/book/) 是入门的绝佳资源.
 
 虽然不是必须的, 但是你有Rust标准库或其它语言编写网络代码的一些经验的话,那将会有所帮助.
@@ -50,5 +50,7 @@ mini-redis-cli get foo
 
 ## 准备开始(Ready to go)
 现在一切都作好了准备. 去到下一章节你将编写你的第一个Rust异步应用.
+
+&rarr; [你好 Tokio](HelloTokio.md)
 
 
