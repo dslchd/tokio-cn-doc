@@ -1,6 +1,6 @@
 # Tokio 中文文档
 ## 1.说明
-Tokio 它是使用Rust语言来编写可靠的，异步的一种运行时. 它有以下几个特点:
+Tokio 它是Rust语言的一种异步**运行时** 可以用来编写可靠，异步的Rust应用. 它有以下几个特点:
 * 快速: Tokio是零成本抽象的，可以带给你接近裸机的性能.
 * 可靠的: Tokio基于Rust语言的生命周期，类型系统，并发模型来减少bug和确保线程安全.
 * 可扩展: Tokio有非常小的占用，并能处理背压(backpressure)和取消(cancellation)操作.
@@ -18,7 +18,7 @@ Tokio是一个事件驱动的非阻塞I/O平台，用于使用Rust编写异步�
 
 ## 2.中文文档索引
 
-### [指南]()
+### 指南
 #### [介绍(Introduction)](doc/Introduction.md)
 #### [你好 Tokio (Hello Tokio)](doc/HelloTokio.md)
 #### [Spawning](doc/Spawning.md)
@@ -34,7 +34,7 @@ Tokio是一个事件驱动的非阻塞I/O平台，用于使用Rust编写异步�
 
 ## 3.其它
 Tokio是一个非常值得学习的，Rust生态中的网络库. 有些类似 "Rust界的Netty" 的感觉，很多上层库，或包，或框架都是基于它(比如 Actix-web).
-因此作为一名 _Rustaceans_ 学习与使用，或理解Tokio意义重大. 此**中文文档**是本人在学习Tokio后的 "果实". 我顺便整理了出来.
+因此作为一名 _Rustaceans_ 学习与使用，或理解Tokio意义重大. 此**中文文档**是本人在学习Tokio后的 **"果实"** . 我顺便整理了出来.
 
 由于水平有限，不敢妄言翻译的有多好，其中难免会有错误和遗漏，如果发现烦请一并指正. 望此文档能给同样对Tokio感兴趣的人的学习提供帮助.
 
