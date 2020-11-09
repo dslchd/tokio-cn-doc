@@ -254,5 +254,72 @@ pub trait Stream {
 }
 ```
 
-`Stream::poll_next()` 函数与`Future::poll`非常类似，不同之处在于，它可以被重复调来来从流中接收多个值. 
+`Stream::poll_next()` 函数与`Future::poll`非常类似，不同之处在于，它可以被重复调来从流中接收多个值. 与我们在[深入异步](AsyncInDepth.md)
+中看到的一样，当流不是就绪状态时将返回`Poll::Pending`. 任务注册waker程序. 一旦应该再次轮询流时，就会通知waker.
+
+`size_hint()` 方法使用的方式与[iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html)相同.
+
+通常当手动实现一个`Stream`时，它是通过组合future和其它流来完成的. 例如，让我们以在[深入异步](AsyncInDepth.md)中实现的`Delay` future为基础.
+我们将它转换成10ms为间隔产生三次`()`的流.
+
+```rust
+use tokio::stream::Stream;
+use std::pin::Pin;
+use std::task::{Context, Poll};
+use std::time::Duration;
+
+struct Interval {
+    rem: usize,
+    delay: Delay,
+}
+
+impl Stream for Interval {
+    type Item = ();
+
+    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>)
+        -> Poll<Option<()>>
+    {
+        if self.rem == 0 {
+            // No more delays
+            return Poll::Ready(None);
+        }
+
+        match Pin::new(&mut self.delay).poll(cx) {
+            Poll::Ready(_) => {
+                let when = self.delay.when + Duration::from_millis(10);
+                self.delay = Delay { when };
+                self.rem -= 1;
+                Poll::Ready(Some(()))
+            }
+            Poll::Pending => Poll::Pending,
+        }
+    }
+}
+```
+
+### `async-stream`
+使用`Stream` trait手动来实现流可能很繁琐. 不幸的是，Rust语言目前还不支持在流上使用`async/await`语法. 这还在进行中，但现在还没准备好.(译者注: 指在流上的`async/await`语法)
+
+[async-stream](https://docs.rs/async-stream) 包是一个临时可用的解决方案. 这个包提供了一个`async_stream!`的宏，可以将输入转换成一个流》
+使用这个包，可以像这样实现上面的间隔需求:
+
+```rust
+use async_stream::stream;
+use std::time::{Duration, Instant};
+
+stream! {
+    let mut when = Instant::now();
+    for _ in 0..3 {
+        let delay = Delay { when };
+        delay.await;
+        yield ();
+        when += Duration::from_millis(10);
+    }
+}
+```
+
+&larr; [Select](Select.md)
+
+&rarr; [词汇表](Glossary.md)
+
 
