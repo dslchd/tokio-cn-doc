@@ -3,7 +3,6 @@ use tokio::sync::{mpsc, oneshot};
 use std::option::Option::Some;
 use mini_redis::client;
 
-
 /// 由请求者提供并通过管理任务来发送,再将命令的响应返回给请求者.
 type Responder<T> = oneshot::Sender<mini_redis::Result<T>>;
 
@@ -21,7 +20,7 @@ enum Command {
 }
 
 
-/// 示例配合 shared-state 服务端使用， 或者按前面教程里 使用 mini-redis-server 服务端
+/// 示例配合 store-value 服务端使用， 或者按前面教程里 使用 mini-redis-server 服务端
 #[tokio::main]
 async fn main() {
     let (mut tx, mut rx) = mpsc::channel(32);

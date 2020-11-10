@@ -83,7 +83,7 @@ async fn main() {
     // 创建一个最大容量为32的通道
     let (mut tx, mut rx) = mpsc::channel(32);
 
-    // ... Rest comes here
+    // ... 这里先休息一下
 }
 ```
 

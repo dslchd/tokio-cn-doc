@@ -12,7 +12,7 @@
 
 ### `async fn read()`
 
-[AsyncReadExt::read](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncReadExt.html#method.read) 提供了一个异步的用来读取数据到缓充区中的方法,并返回读取的字节数.
+[AsyncReadExt::read](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncReadExt.html#method.read) 提供了一个异步的用来读取数据到缓冲区中的方法,并返回读取的字节数.
 
 **注意** : 当 `read()` 返回 `Ok(0)` 时, 这表明流已被关闭了. 对 `read()` 的任何其它的调用将立即返回`Ok(0)`完成. 对于 [TcpStream](https://docs.rs/tokio/0.2/tokio/net/struct.TcpStream.html) 实例, 这表明socket的读取部分已经关闭.
 
@@ -111,7 +111,7 @@ async fn main() -> io::Result<()> {
 }
  ```
 
-注意, 这利用了字节数组也实现了 `AsyncRead` 这一功能.
+注意, 这利用了字节数组也实现了 `AsyncRead` 这一特点.
 
 ## 回声服务器(Echo server)
 让我们练习一些异步I/O. 我们将编写一个回声服务.
@@ -313,3 +313,7 @@ loop {
 忘记以EOF标识来跳出循环的结果就是会造成CPU 100%循环占用. 关闭socket后, `socket.read()` 会立即返回. 然后循环会一直重复下去.
 
 完整的代码参考 [这里](https://github.com/tokio-rs/website/blob/master/tutorial-code/io/src/echo-server.rs)
+
+&larr; [通道(Channels)](Channels.md)
+
+&rarr; [帧(Framing)](Framing.md)
