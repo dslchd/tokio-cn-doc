@@ -16,6 +16,8 @@ Tokio是一个事件驱动的非阻塞I/O平台，用于使用Rust编写异步�
 
 [bin](src/bin) 目录下有一些可以参考的，基于官方文档的示例代码.
 
+我的其它翻译：[Actix-web 3.0 中文文档](https://github.com/dslchd/actix-web3-CN-doc).
+
 ## 2.中文文档索引
 
 ### 指南
@@ -37,5 +39,3 @@ Tokio是一个非常值得学习的，Rust生态中的网络库. 有些类似 "R
 因此作为一名 _Rustaceans_ 学习与使用，或理解Tokio意义重大. 此**中文文档**是本人在学习Tokio后的 **"果实"** . 我顺便整理了出来.
 
 由于水平有限，不敢妄言翻译的有多好，其中难免会有错误和遗漏，如果发现烦请一并指正. 望此文档能给同样对Tokio感兴趣的人的学习带来一点帮助.
-
-我的其它翻译：[Actix-web 3.0 中文文档](https://github.com/dslchd/actix-web3-CN-doc).
