@@ -9,7 +9,9 @@ async fn main() {
     // 初始化一个Delay
     let future = Delay{when};
 
+    println!("Before future.await call");
+
     let out = future.await;
 
-    assert_eq!(out, "done");
+    println!("future.await result : {}", out)
 }
