@@ -41,7 +41,9 @@ pub trait Future {
 }
 ```
 
-[associated type](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#specifying-placeholder-types-in-trait-definitions-with-associated-types) `Output` 是一个future完成后产生的类型. [Pin](https://doc.rust-lang.org/std/pin/index.html) 类型是Rust在 `async` 函数中如何支持借用. 查看 [standard library](https://doc.rust-lang.org/std/pin/index.html) 了解更多的细节. 与其它语言实现的future不一样， 一个Rust的future不代表在后台发生的计算，而是Rust的future就是计算本身. future的所有者通过轮询future来推进计算. 这是通过调用 `Future::poll`来完成的.
+[associated type](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#specifying-placeholder-types-in-trait-definitions-with-associated-types) `Output` 是一个future完成后产生的类型. 
+[Pin](https://doc.rust-lang.org/std/pin/index.html) 类型是Rust在 `async` 函数中如何支持借用. 查看 [standard library](https://doc.rust-lang.org/std/pin/index.html) 了解更多的细节. 
+与其它语言实现的future不一样， 一个Rust的future不代表在后台发生的计算，而是Rust的future就是计算本身. future的所有者通过轮询future来推进计算. 这是通过调用 `Future::poll`来完成的.
 
 ### 实现 `Future` (Implementing `Future`)
 
@@ -90,7 +92,8 @@ async fn main() {
 
 ### Async fn as a Future
 
-在main函数中，我们实例化一个future并在它上面调用 `.await`. 在异步函数中，我们可以在任何实现了 `Future` 的值上调用 `.await` .  反过来说， 调用一个 `async` 函数会返回一个实现了 `Future` 的匿名类型. 在 `async fn main()` 中，生成的future大致为:
+在main函数中，我们实例化一个future并在它上面调用 `.await`. 在异步函数中，我们可以在任何实现了 `Future` 的值上调用 `.await` .  
+反过来说， 调用一个 `async` 函数会返回一个实现了 `Future` 的匿名类型. 在 `async fn main()` 中，生成的future大致为:
 
 ```rust
 use std::future::Future;
@@ -126,7 +129,7 @@ impl Future for MainFuture {
                 State1(ref mut my_future) => {
                     match Pin::new(my_future).poll(cx) {
                         Poll::Ready(out) => {
-                            assert_eq!(out， "done");
+                            assert_eq!(out, "done");
                             *self = Terminated;
                             return Poll::Ready(());
                         }
