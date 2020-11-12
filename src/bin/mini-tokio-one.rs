@@ -52,7 +52,7 @@ impl MiniTokio {
         let waker = task::noop_waker();
         let mut context = Context::from_waker(&waker);
 
-        // 循环人队列中拿任务task 并匹配，
+        // 循环队列中拿任务task 并匹配，
         while let Some(mut task) = self.tasks.pop_front() {
             if task.as_mut().poll(&mut context).is_pending() {
                 self.tasks.push_back(task);
