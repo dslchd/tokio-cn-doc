@@ -129,7 +129,7 @@ async fn main() {
 也可以在不同的运行时线程上执行. 任务产生后也可以在不同的线程之间移动.
 
 ## 静态边界(`'static bound`)
-通过　`tokio::spawn` 产生的任务必须是　`'static` 的. 产生的表达式不能借用任务数据.
+通过　`tokio::spawn` 产生的任务必须是　`'static` 的. 产生(Spawned)的表达式不能借用任何数据.
 
 有一种普遍的误解是, "静态"意味着"永久存活"("being static" means "lives forever"),　然而情况不并是这样. 如果仅仅因为值是　`'static` 
 的话并不意味着存在内存泄露. 有关这点你可以在[Common Rust Lifetime Misconceptions](https://github.com/pretzelhammer/rust-blog/blob/master/posts/common-rust-lifetime-misconceptions.md#2-if-t-static-then-t-must-be-valid-for-the-entire-program)
