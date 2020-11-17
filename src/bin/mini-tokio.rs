@@ -30,7 +30,7 @@ fn main() {
         // 产生一个任务
         spawn(async {
             // 等待一小段时间以便 world在 hello后面打印
-            delay(Duration::from_millis(1000)).await;
+            delay(Duration::from_secs(5)).await;
             println!("world")
         });
 
@@ -39,15 +39,13 @@ fn main() {
            println!("hello");
         });
 
-        //我们没有实现执行器的shutdown功能，因此这个强制关闭
-        delay(Duration::from_secs(2)).await; // 2秒后关闭吧
+        //我们没有实现执行器的shutdown功能，因此这里强制关闭
+        delay(Duration::from_secs(10)).await; // 2秒后关闭吧
         std::process::exit(0);
     });
 
 
     // 启动mini-tokio 执行器循环，调度任务并接收执行结果
-    mini_tokio.run();
-
     mini_tokio.run();
 }
 
@@ -95,7 +93,7 @@ impl Task {
         // 使用waker来初始化task的上下文
         let mut cx = Context::from_waker(&waker);
 
-        // 这里绝不会阻塞，因为只有一你上线程能锁住future
+        // 这里绝不会阻塞，因为只有一个线程能锁住future
         let mut future = self.future.try_lock().unwrap();
 
         // 轮询future
