@@ -1,5 +1,5 @@
 ## 流(Streams)
-流是一个一系列异步值. 它与Rust的 [std::iter::Iterator](https://doc.rust-lang.org/book/ch13-02-iterators.html) 异步等效且由
+流是一个一系列异步值的称呼. 它与Rust的 [std::iter::Iterator](https://doc.rust-lang.org/book/ch13-02-iterators.html) 异步等效且由
 [Stream](https://docs.rs/tokio/0.3/tokio/stream/trait.Stream.html) trait表示. 流能在`async`函数中迭代. 它们也可以使用适配器进行
 转换. Tokio在 [StreamExt](https://docs.rs/tokio/0.3/tokio/stream/trait.StreamExt.html) trait上提供了一些通用适配器.
 
@@ -95,7 +95,7 @@ async fn main() -> mini_redis::Result<()> {
 [pinned](https://doc.rust-lang.org/std/pin/index.html). `into_stream()` 函数返回的流不是固定的，我们必须显示的固定住它来进行迭代.
 
 ```markdown
-一个Rust的值是"pinned"时，它会被固定且它不能再内存中移动. 固定值的关键是可以将指针用作固定数据，并且调用都可以确信指针一直保持有效.
+一个Rust的值是"pinned"时，它会被固定且它不能在内存中移动. 固定值的关键是可以将指针用作固定数据，并且调用都可以确信指针一直保持有效.
 `async/await`使用此特性来支持跨`.await`点的数据**借用**.
 ```
 
