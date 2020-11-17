@@ -145,7 +145,7 @@ shard.insert(key, value);
 use std::sync::Mutex;
 
 async fn increment_and_do_stuff(mutex: &Mutex<i32>) {
-    let mut lock = mutex.lock().unwarp();
+    let mut lock = mutex.lock().unwrap();
     *lock += 1;
     do_something_async().await;
 } // lock 在这里超出作用域范围
