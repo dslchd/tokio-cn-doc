@@ -20,7 +20,7 @@ async fn .
 
 ```rust
 use tokio::net::{TcpListener, TcpStream};
-use mini_redis::{connection, Frame};
+use mini_redis::{Connection, Frame};
 
 #[tokio::main]
 async fn main() {
@@ -36,7 +36,7 @@ async fn main() {
 
 async fn process(socket: TcpStream) {
     // "链接" 可以让我们通过字节流 读/写 redis的 **帧**. "链接" 类型被 mini-redis 定义.
-    let mut connection = connection::new(socket);
+    let mut connection = Connection::new(socket);
 
     if let Some(frame) = connection.read_frame().await.unwrap() {
         println!("GOT: {:?}", frame);
@@ -267,7 +267,7 @@ note: future is not `Send` as this value is used across an await
 
 ```rust
 use tokio::net::TcpStream;
-use mini_redis::{connection, Frame};
+use mini_redis::{Connection, Frame};
 
 async fn process(socket: TcpStream) {
     use mini_redis::Command::{self, Get, Set};
@@ -277,7 +277,7 @@ async fn process(socket: TcpStream) {
     let mut db = HashMap::new();
 
     // 通过 mini-redis 提供的链接, 可以处理来自socket中的　帧
-    let mut connection = connection::new(socket);
+    let mut connection = Connection::new(socket);
 
     // 使用　read_frame 来接收一个来自　链接中的　命令
     while let Some(frame) = connection.read_frame().await.unwrap() {
