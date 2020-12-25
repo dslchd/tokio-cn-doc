@@ -100,8 +100,8 @@ use tokio::sync::mpsc;
 
 #[tokio::main]
 async fn main() {
-    let (mut tx, mut rx) = mpsc::channel(32);
-    let mut tx2 = tx.clone();
+    let (tx, mut rx) = mpsc::channel(32);
+    let tx2 = tx.clone();
 
     tokio::spawn(async move {
         tx.send("sending from first handle").await;
@@ -154,7 +154,7 @@ let manager = tokio::spawn(async move {
 
 ```rust
 // Sender 被移动到task中了, 这里有两个任务, 所以我们需要第二个　Sender
-let mut tx2 = tx.clone();
+let tx2 = tx.clone();
 
 // 产生两个任务一个得到key值,一个设置key的值
 let t1 = tokio::spawn(async move {
