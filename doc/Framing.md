@@ -309,7 +309,7 @@ impl connection {
 use tokio::io::{self, AsyncWriteExt};
 use mini_redis::Frame;
 
-async fn write_value(&mut self, frame: &Frame)
+async fn write_frame(&mut self, frame: &Frame)
     -> io::Result<()>
 {
     match frame {
