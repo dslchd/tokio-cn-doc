@@ -76,7 +76,7 @@ impl connection {
 
 为了实现这一点, `connection`需要一个读取缓冲区字段. 数据从socket中读取到读缓冲区(read buffer)中. 当一个帧被解析时, 相应的数据就会从缓冲区中移除.
 
-我们将使用 [BytesMut](https://docs.rs/bytes/0.5/bytes/struct.BytesMut.html) 作为缓冲区(buffer)的类型. 这是一个 [Bytes](https://docs.rs/bytes/) 的可变版本.
+我们将使用 [BytesMut](https://docs.rs/bytes/1/bytes/struct.BytesMut.html) 作为缓冲区(buffer)的类型. 这是一个 [Bytes](https://docs.rs/bytes/1/bytes/struct.Bytes.html) 的可变版本.
 
 ```rust
 use bytes::BytesMut;
