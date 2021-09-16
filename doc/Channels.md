@@ -316,7 +316,7 @@ loop {
 
 
 
-&larr; [共享状态](sharedState.md)
+&larr; [共享状态](SharedState.md)
 
 &rarr; [I/O](IO.md)
 
