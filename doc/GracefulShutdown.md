@@ -13,7 +13,7 @@
 
 ### 确定何时关机(Figuring out when to shut down)
 这一点肯定是取决于应用程序，但有一个很关键的标准是应用程序从操作系统接收一个信号。这种情况发生在，当你的应用程序运行在终端时按 `ctrl+c`
-时。为了侦探到这个信息号，`Tokio` 提供了一个 [tokio::signal::ctrl_c](https://docs.rs/tokio/1/tokio/signal/fn.ctrl_c.html) 函数，
+时。为了侦探到这个信号，`Tokio` 提供了一个 [tokio::signal::ctrl_c](https://docs.rs/tokio/1/tokio/signal/fn.ctrl_c.html) 函数，
 你可以像下面这样来使用它:
 
 ```rust
@@ -113,7 +113,7 @@ async fn main() {
     drop(send);
 
     // When every sender has gone out of scope, the recv call
-    // 当每人个 sender 超过作用域时，recv 的调用将返回error。这里我们忽略它。
+    // 当每个 sender 超过作用域时，recv 的调用将返回error。这里我们忽略它。
     // will return with an error. We ignore the error.
     let _ = recv.recv().await;
 }

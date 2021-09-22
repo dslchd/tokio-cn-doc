@@ -36,7 +36,7 @@ fn main() {
 在这一章节中，我们将介绍如何通过存储 `Runtime` 对象并使用它的 `block_on` 方法来构建与 `mini-redis` 同步的接口。在下面的章节中我们将讨论
 一些替代方法和如何使用这些替代方法。
 
-我们要包装的接口是一个异步的 [Client](https://docs.rs/mini-redis/0.4/mini_redis/client/struct.Client.html) 类型。它有几方法，我们将
+我们要包装的接口是一个异步的 [Client](https://docs.rs/mini-redis/0.4/mini_redis/client/struct.Client.html) 类型。它有几个方法，我们将
 实现这几个方法的阻塞版本:
 
 * [Client::get](https://docs.rs/mini-redis/0.4/mini_redis/client/struct.Client.html#method.get)
@@ -83,15 +83,15 @@ pub fn connect<T: ToSocketAddrs>(addr: T) -> crate::Result<BlockingClient> {
 
 有一个很重要的细节是这里使用了 [current_thread](https://docs.rs/tokio/1/tokio/runtime/struct.Builder.html#method.new_current_thread) 运行时。
 通常，当我们使用 Tokio 时默认情况下使用使用 [multi_thread](https://docs.rs/tokio/1/tokio/runtime/struct.Builder.html#method.new_multi_thread) 运行时，
-它会产生一堆的后台线程因此它可以在同一时刻非常高效的运行很多东西。在我们的示例中，我们在同一时候会仅仅只做一件事，因此我们没必要在后台运行多个线程。这使得
+它会产生一堆的后台线程因此它可以在同一时刻非常高效的运行很多东西。在我们的示例中，我们在同一时候仅仅只做一件事，因此我们没必要在后台运行多个线程。这使得
 [current_thread](https://docs.rs/tokio/1/tokio/runtime/struct.Builder.html#method.new_current_thread) 非常适合，而不是产生多个线程。
 
-调用 [enable_all](https://docs.rs/tokio/1/tokio/runtime/struct.Builder.html#method.enable_all) 在tokio的运行时上启动IO和计时驱动。
+调用 [enable_all](https://docs.rs/tokio/1/tokio/runtime/struct.Builder.html#method.enable_all) 在tokio的运行时上来启动IO和计时驱动。
 如果它没被启动，运行时将不能执行IO或计时器功能。
 
 ```text
 因为 `current_thread` 运行时不产生线程，它仅仅在 `block_on` 被调用时运行。一旦 `block_on` 返回，所有在运行时上产生的任务都会被冻结，直到你
-再次调用 `block_on` 方法。 如果在不调用 `block_on` 时产生的任务也要保持运行，那么请使用 `multi_thread` 运行时。
+再次调用 `block_on` 方法。 如果想要在不调用 `block_on` 时产生的任务也要保持运行，那么请使用 `multi_thread` 运行时。
 ```
 
 一旦我们有了这样的结构，大部分方法实现起来就很容易了:
@@ -124,7 +124,8 @@ impl BlockingClient {
 }
 ```
 
-[Client::subscribe] 方法更加有趣，因为它将 `Client` 对象转换成 `Subscriber` 对象。 我们可以像下面这样实现它: 
+[Client::subscribe](https://docs.rs/mini-redis/0.4/mini_redis/client/struct.Client.html#method.subscribe) 方法更加有趣，
+因为它将 `Client` 对象转换成 `Subscriber` 对象。 我们可以像下面这样实现它: 
 
 ```rust
 /// 一个能进入的 发布/订阅模式的客户端
@@ -181,7 +182,7 @@ impl BlockingSubscriber {
 注意到，异步的 `Subscriber` 结构体有一个非异步的方法 `get_subscribed` 。为了处理这个，我们直接使用非运行时的方式来调用它。
 
 ### 其它方法(Other approaches)
-上面的章节解释了实现同步包装器的简单方式，但这不是唯一的方法。一般的方法有:
+上面的章节解释了实现同步包装器的简单方式，但这不是唯一的方法。一般的方法还有:
 
 * 创建一个 [Runtime](https://docs.rs/tokio/1/tokio/runtime/struct.Runtime.html) 并在异步代码上调用 [block_on](https://docs.rs/tokio/1/tokio/runtime/struct.Runtime.html#method.block_on) 
 * 创建一个 [Runtime](https://docs.rs/tokio/1/tokio/runtime/struct.Runtime.html) 并在它上面 [Spawn](https://docs.rs/tokio/1/tokio/runtime/struct.Runtime.html#method.spawn) 一些事。
@@ -190,7 +191,7 @@ impl BlockingSubscriber {
 我们已经看到了第一种的实现方式，另外两种将在下面来介绍。
 
 
-#### 在一个Runtime上产生一个东西 (Spawning things on a runtime)
+#### 在一个Runtime上产生一些东西 (Spawning things on a runtime)
 [Runtime](https://docs.rs/tokio/1/tokio/runtime/struct.Runtime.html) 对象上有一个 [spawn](https://docs.rs/tokio/1/tokio/runtime/struct.Runtime.html#method.spawn) 方法。
 当我们调用这个方法时，你可以在运行时上产生一个新任务。比如像下面这样:
 
@@ -270,7 +271,7 @@ Task 0 stopping.
 
 在这个例子中，运行时配置 [multi_thread](https://docs.rs/tokio/1/tokio/runtime/struct.Builder.html#method.new_multi_thread) 是很重要的。
 如果你将它改为 `current_thread` 运行时，你会发现耗时的任务会在任何后台任务开始之前完成。这是因为在 `current_thread` 上产生的后台任务，只会在调用
-`block_on` 期间运行，否在运行时没有任何地方可以运行它们。
+`block_on` 期间运行，否则运行时没有任何地方可以运行它们。
 
 例子，通过调用 [spawn](https://docs.rs/tokio/1/tokio/runtime/struct.Runtime.html#method.spawn) 返回的 [JoinHandle](https://docs.rs/tokio/1/tokio/task/struct.JoinHandle.html)
 对象上的 `block_on` 方法来等待生成任务的完成，但这也并非唯一方法。这里还有一些其它的替代方案:
@@ -348,7 +349,7 @@ impl TaskSpawner {
 }
 ```
 
-这个示例可以通过多种方式来配置。比如，你可以使用 [Semaphore](https://docs.rs/tokio/1/tokio/sync/struct.Semaphore.html) 信息量来限制活动的任务数量，
+这个示例可以通过多种方式来配置。比如，你可以使用 [Semaphore](https://docs.rs/tokio/1/tokio/sync/struct.Semaphore.html) 信号量来限制活动的任务数量，
 或者你可以使用相反方向的channel向 spawner 发送响应。当你以这种方式生成运行时时， 它是一个 [actor](https://ryhl.io/blog/actors-with-tokio/) 类型。
 
 
