@@ -127,3 +127,7 @@ async fn some_operation(i: u64, _sender: Sender<()>) {
 ```
 
 有个很重要的点是，等待关闭的任务都持有一个sender. 在这种情况下你必须确保等待通道关闭之前删除此sender。
+
+&larr; [同步代码桥接](BridgingWithSyncCode.md)
+
+&rarr; [词汇表](Glossary.md)

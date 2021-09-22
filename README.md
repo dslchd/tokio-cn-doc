@@ -31,6 +31,9 @@ Tokio是一个事件驱动的非阻塞I/O平台，用于使用Rust编写异步�
 #### [深入异步(Async in depth)](doc/AsyncInDepth.md)
 #### [Select](doc/Select.md)
 #### [流(Streams)](doc/Streams.md)
+### [主题(Topics)](doc/Topics.md)
+#### [使用同步代码桥接(Bridging with sync code)](doc/BridgingWithSyncCode.md)
+#### [优雅关机(Graceful Shutdown)](doc/GracefulShutdown.md)
 ### [词汇表(Glossary)](doc/Glossary.md)
 ### [API文档(API documentation)](https://docs.rs/tokio)
 
